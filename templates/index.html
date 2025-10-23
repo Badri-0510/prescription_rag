@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediSummarize - Patient Prescription System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .portal-selection {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .portal-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 800px;
+        }
+        
+        .portal-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .portal-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .portal-card .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .portal-card h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .portal-card button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .portal-card button:hover {
+            transform: scale(1.05);
+        }
+        
+        .portal-card input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+        
+        .dashboard.active {
+            display: block;
+        }
+        
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar h1 {
+            color: #667eea;
+            font-size: 24px;
+        }
+        
+        .navbar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .navbar button {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        .dashboard-content {
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: white;
+            min-height: calc(100vh - 60px);
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-item:hover {
+            background: #f0f0f0;
+        }
+        
+        .sidebar-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .search-box button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .patient-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .patient-info h3 {
+            margin-bottom: 10px;
+        }
+        
+        .patient-info p {
+            margin: 5px 0;
+        }
+        
+        .summary-display {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .file-upload {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 20px 0;
+        }
+        
+        .file-upload:hover {
+            background: #f8f9ff;
+            border-color: #764ba2;
+        }
+        
+        .file-upload input[type="file"] {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #667eea;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="portal-selection" id="loginPage">
+        <div class="portal-cards">
+            <div class="portal-card">
+                <div class="icon">👨‍⚕️</div>
+                <h2>Doctor Login</h2>
+                <form id="doctorLoginForm" style="margin-top: 20px;">
+                    <input type="email" placeholder="Email" required>
+                    <input type="password" placeholder="Password" required>
+                    <button type="submit">Login as Doctor</button>
+                </form>
+                <small style="color: #999; display: block; margin-top: 10px;">Demo: doctor@demo.com / doctor123</small>
+            </div>
+            
+            <div class="portal-card">
+                <div class="icon">👤</div>
+                <h2>Patient Login</h2>
+                <form id="patientLoginForm" style="margin-top: 20px;">
+                    <input type="text" placeholder="Patient ID (e.g., P001)" required>
+                    <button type="submit">Login as Patient</button>
+                </form>
+                <small style="color: #999; display: block; margin-top: 10px;">Demo: P001</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctor Dashboard -->
+    <div class="dashboard" id="doctorDashboard">
+        <div class="navbar">
+            <h1>🏥 MediSummarize - Doctor Portal</h1>
+            <div class="user-info">
+                <span>Dr. <span id="doctorName">Loading...</span></span>
+                <button onclick="logout()">Logout</button>
+            </div>
+        </div>
+        
+        <div class="dashboard-content">
+            <div class="sidebar">
+                <div class="sidebar-item active" onclick="showSection('viewSummary')">
+                    📋 View Patient Summary
+                </div>
+                <div class="sidebar-item" onclick="showSection('addPrescription')">
+                    ➕ Add New Prescription
+                </div>
+                <div class="sidebar-item" onclick="showSection('patientHistory')">
+                    📚 Patient History
+                </div>
+                <div class="sidebar-item" onclick="showSection('searchPatient')">
+                    🔍 Search Patient
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <!-- View Summary Section -->
+                <div class="section active" id="viewSummary">
+                    <div class="card">
+                        <h2>📋 View Patient Summary</h2>
+                        
+                        <div class="search-box">
+                            <input type="text" id="summaryPatientId" placeholder="Enter Patient ID (e.g., P001)">
+                            <button onclick="loadPatientSummary()">Load Summary</button>
+                        </div>
+                        
+                        <div id="patientInfoCard" style="display:none;">
+                            <div class="patient-info">
+                                <h3 id="patientNameDisplay">Patient Name</h3>
+                                <p>Patient ID: <span id="patientIdDisplay"></span></p>
+                                <p>Last Updated: <span id="lastUpdatedDisplay"></span></p>
+                            </div>
+                            
+                            <div class="summary-display" id="summaryContent"></div>
+                        </div>
+                        
+                        <div class="loading" id="summaryLoading">
+                            <div class="spinner"></div>
+                            <p>Loading patient summary...</p>
+                        </div>
+                        
+                        <div class="message" id="summaryMessage"></div>
+                    </div>
+                </div>
+                
+                <!-- Add Prescription Section -->
+                <div class="section" id="addPrescription">
+                    <div class="card">
+                        <h2>➕ Add New Prescription</h2>
+                        
+                        <form id="prescriptionForm">
+                            <div class="form-group">
+                                <label for="prescPatientId">Patient ID</label>
+                                <input type="text" id="prescPatientId" required placeholder="P001">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Upload Prescription</label>
+                                <div class="file-upload" onclick="document.getElementById('prescFile').click()">
+                                    <input type="file" id="prescFile" accept=".pdf,.jpg,.jpeg,.png" required>
+                                    <p id="prescFileName">📄 Click to select PDF or Image</p>
+                                    <small style="color: #666;">Supported: PDF, JPG, PNG (Max 16MB)</small>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn">Process & Add Prescription</button>
+                        </form>
+                        
+                        <div class="loading" id="prescLoading">
+                            <div class="spinner"></div>
+                            <p>Processing prescription... This may take a moment</p>
+                        </div>
+                        
+                        <div class="message" id="prescMessage"></div>
+                        
+                        <div id="prescResult" style="display:none; margin-top: 30px;">
+                            <h3 style="color: #667eea; margin-bottom: 15px;">✅ Prescription Added Successfully!</h3>
+                            <div class="summary-display" id="prescResultContent"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Patient History Section -->
+                <div class="section" id="patientHistory">
+                    <div class="card">
+                        <h2>📚 Patient History</h2>
+                        <div class="search-box">
+                            <input type="text" id="historyPatientId" placeholder="Enter Patient ID">
+                            <button onclick="loadPatientHistory()">Load History</button>
+                        </div>
+                        <div class="message" id="historyMessage"></div>
+                    </div>
+                </div>
+                
+                <!-- Search Patient Section -->
+                <div class="section" id="searchPatient">
+                    <div class="card">
+                        <h2>🔍 Search Patient</h2>
+                        <div class="search-box">
+                            <input type="text" id="searchQuery" placeholder="Search by name or ID">
+                            <button onclick="searchPatients()">Search</button>
+                        </div>
+                        <div id="searchResults"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Dashboard -->
+    <div class="dashboard" id="patientDashboard">
+        <div class="navbar">
+            <h1>🏥 MediSummarize - Patient Portal</h1>
+            <div class="user-info">
+                <span>Welcome, <span id="patientNameNav">Patient</span></span>
+                <button onclick="logout()">Logout</button>
+            </div>
+        </div>
+        
+        <div class="dashboard-content">
+            <div class="main-content" style="max-width: 1000px; margin: 0 auto;">
+                <div class="card">
+                    <h2>👤 My Medical Summary</h2>
+                    
+                    <div class="form-group">
+                        <label for="patientIdInput">Enter Your Patient ID</label>
+                        <input type="text" id="patientIdInput" placeholder="P001">
+                        <button class="btn" onclick="loadPatientView()" style="margin-top: 10px;">View My Summary</button>
+                    </div>
+                    
+                    <div class="loading" id="patientLoading">
+                        <div class="spinner"></div>
+                        <p>Loading your medical summary...</p>
+                    </div>
+                    
+                    <div class="message" id="patientMessage"></div>
+                    
+                    <div id="patientSummaryCard" style="display:none;">
+                        <div class="patient-info">
+                            <h3 id="patientNameCard">Your Name</h3>
+                            <p>Patient ID: <span id="patientIdCard"></span></p>
+                            <p>Last Updated: <span id="patientLastUpdated"></span></p>
+                        </div>
+                        
+                        <h3 style="color: #667eea; margin: 20px 0;">Your Medical Summary (Simple Language)</h3>
+                        <div class="summary-display" id="patientSummaryContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        
+        window.onload = async function() {
+            try {
+                const response = await fetch('/api/session');
+                const data = await response.json();
+                
+                if (data.logged_in) {
+                    currentUser = data;
+                    if (data.user_type === 'doctor') {
+                        document.getElementById('doctorName').textContent = data.user_name;
+                        showDashboard('doctor');
+                    } else {
+                        document.getElementById('patientNameNav').textContent = data.user_name;
+                        document.getElementById('patientIdInput').value = data.user_id;
+                        showDashboard('patient');
+                    }
+                }
+            } catch (error) {
+                console.log('No active session');
+            }
+        };
+        
+        document.getElementById('doctorLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input[type="email"]').value;
+            const password = this.querySelector('input[type="password"]').value;
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_type: 'doctor',
+                        identifier: email,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentUser = data;
+                    document.getElementById('doctorName').textContent = data.name;
+                    showDashboard('doctor');
+                } else {
+                    alert('Login failed: ' + data.error);
+                }
+            } catch (error) {
+                alert('Login error: ' + error.message);
+            }
+        });
+        
+        document.getElementById('patientLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const patientId = this.querySelector('input[type="text"]').value;
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_type: 'patient',
+                        identifier: patientId,
+                        password: ''
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentUser = data;
+                    document.getElementById('patientNameNav').textContent = data.name;
+                    document.getElementById('patientIdInput').value = data.user_id;
+                    showDashboard('patient');
+                    loadPatientView();
+                } else {
+                    alert('Login failed: ' + data.error);
+                }
+            } catch (error) {
+                alert('Login error: ' + error.message);
+            }
+        });
+        
+        function showDashboard(type) {
+            document.getElementById('loginPage').style.display = 'none';
+            if (type === 'doctor') {
+                document.getElementById('doctorDashboard').classList.add('active');
+            } else {
+                document.getElementById('patientDashboard').classList.add('active');
+            }
+        }
+        
+        async function logout() {
+            await fetch('/api/logout', {method: 'POST'});
+            location.reload();
+        }
+        
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        document.getElementById('prescFile').addEventListener('change', function() {
+            if (this.files.length > 0) {
+                document.getElementById('prescFileName').textContent = `📄 ${this.files[0].name}`;
+            }
+        });
+        
+        async function loadPatientSummary() {
+            const patientId = document.getElementById('summaryPatientId').value.trim();
+            if (!patientId) {
+                showMessage('summaryMessage', 'Please enter a patient ID', 'error');
+                return;
+            }
+            
+            showLoading('summaryLoading', true);
+            hideMessage('summaryMessage');
+            document.getElementById('patientInfoCard').style.display = 'none';
+            
+            try {
+                const response = await fetch(`/api/history/${patientId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('patientIdDisplay').textContent = patientId;
+                    document.getElementById('patientNameDisplay').textContent = data.patient?.name || 'Unknown';
+                    document.getElementById('lastUpdatedDisplay').textContent = new Date().toLocaleDateString();
+                    document.getElementById('summaryContent').textContent = data.summary;
+                    document.getElementById('patientInfoCard').style.display = 'block';
+                } else {
+                    showMessage('summaryMessage', data.message || 'No summary found', 'error');
+                }
+            } catch (error) {
+                showMessage('summaryMessage', 'Error: ' + error.message, 'error');
+            } finally {
+                showLoading('summaryLoading', false);
+            }
+        }
+        
+        document.getElementById('prescriptionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const patientId = document.getElementById('prescPatientId').value.trim();
+            const fileInput = document.getElementById('prescFile');
+            
+            if (!fileInput.files.length) {
+                showMessage('prescMessage', 'Please select a file', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('prescription', fileInput.files[0]);
+            formData.append('patient_id', patientId);
+            
+            showLoading('prescLoading', true);
+            hideMessage('prescMessage');
+            document.getElementById('prescResult').style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('prescResultContent').textContent = data.doctor_summary;
+                    document.getElementById('prescResult').style.display = 'block';
+                    showMessage('prescMessage', 'Prescription processed successfully!', 'success');
+                    this.reset();
+                    document.getElementById('prescFileName').textContent = '📄 Click to select PDF or Image';
+                } else {
+                    showMessage('prescMessage', data.error || 'Upload failed', 'error');
+                }
+            } catch (error) {
+                showMessage('prescMessage', 'Error: ' + error.message, 'error');
+            } finally {
+                showLoading('prescLoading', false);
+            }
+        });
+        
+        async function loadPatientView() {
+            const patientId = document.getElementById('patientIdInput').value.trim();
+            if (!patientId) {
+                showMessage('patientMessage', 'Please enter your patient ID', 'error');
+                return;
+            }
+            
+            showLoading('patientLoading', true);
+            hideMessage('patientMessage');
+            document.getElementById('patientSummaryCard').style.display = 'none';
+            
+            try {
+                const response = await fetch(`/api/history/${patientId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('patientIdCard').textContent = patientId;
+                    document.getElementById('patientNameCard').textContent = data.patient?.name || 'Your Name';
+                    document.getElementById('patientLastUpdated').textContent = new Date().toLocaleDateString();
+                    document.getElementById('patientSummaryContent').textContent = data.summary;
+                    document.getElementById('patientSummaryCard').style.display = 'block';
+                } else {
+                    showMessage('patientMessage', data.message || 'No records found', 'error');
+                }
+            } catch (error) {
+                showMessage('patientMessage', 'Error: ' + error.message, 'error');
+            } finally {
+                showLoading('patientLoading', false);
+            }
+        }
+        
+        function showLoading(id, show) {
+            document.getElementById(id).style.display = show ? 'block' : 'none';
+        }
+        
+        function showMessage(id, text, type) {
+            const el = document.getElementById(id);
+            el.textContent = text;
+            el.className = `message ${type}`;
+            el.style.display = 'block';
+        }
+        
+        function hideMessage(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+        
+        function loadPatientHistory() {
+            showMessage('historyMessage', 'History feature coming soon!', 'error');
+        }
+        
+        function searchPatients() {
+            alert('Search feature coming soon!');
+        }
+    </script>
+</body>
+</html>
