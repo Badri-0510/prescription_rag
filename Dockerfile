@@ -15,4 +15,4 @@ COPY . .
 ENV PORT=8080
 
 # Start your app
-CMD ["python", "main.py"]
+CMD ["python", "app.py"]
