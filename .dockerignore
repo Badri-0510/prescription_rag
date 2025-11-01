@@ -1,0 +1,13 @@
+.env
+*.pyc
+__pycache__
+.git
+.gitignore
+README.md
+.vscode
+.github
+*.md
+uploads/*
+!uploads/.gitkeep
+.gcloudignore
+chroma_db/*
