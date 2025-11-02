@@ -4,11 +4,16 @@ Developed and implemented the Prescription Summarizer module.
 Completed RAG (Retrieval-Augmented Generation) pipeline for summarization.
 
 Technical Stack Used:
-Backend : Python Flask
-Frontend : JavaScript, HTML 
+Backend : Python Flask.
+
+Frontend : JavaScript, HTML.
+
 Vector Database: ChromaDB for efficient embedding storage and retrieval.
+
 Model: Gemini 2.5 Flash for text and document understanding.
+
 Database: SQLite for lightweight data handling.
+
 Deployment: Google Cloud run after dockerisation
 
 Functionality Overview:
